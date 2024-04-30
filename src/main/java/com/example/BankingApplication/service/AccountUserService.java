@@ -5,6 +5,7 @@ import com.example.BankingApplication.model.LoginRequest;
 import com.example.BankingApplication.model.LoginResponse;
 import com.example.BankingApplication.model.Role;
 import com.example.BankingApplication.repository.AccountUserRepository;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,9 @@ public class AccountUserService {
     @Autowired
     private JWTService jwtService;
 
+    @Autowired
+    private MessageService messageService;
+
     public ResponseEntity<List<AccountUser>> getAllAccountUsers(){
         return new ResponseEntity<>(userRepository.findAll(), HttpStatus.OK);
     }
@@ -41,16 +45,22 @@ public class AccountUserService {
         return new ResponseEntity<>(userRepository.findById(id).get(), HttpStatus.OK);
     }
 
-    public ResponseEntity<LoginResponse> authenticate(LoginRequest request){
+    public ResponseEntity<LoginResponse> authenticate(LoginRequest request) throws MessagingException {
 
         Authentication auth = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
-        if( auth != null ){
-            AccountUser user = userRepository.getByUsername(request.getUsername());
-            String token = jwtService.createToken(user);
-            return new ResponseEntity<>(LoginResponse.builder().user(user).token(token).build(), HttpStatus.OK);
-        }
+
+            if( auth != null ){
+                AccountUser user = userRepository.getByUsername(request.getUsername());
+                String token = jwtService.createToken(user);
+                messageService.loginNotification(user.getUsername(), "Dear "+ user.getFirstName() +"\n" +
+                        "There has been a successful login into your Banking Account. Please if you did not log in" +
+                        " call us on the following number: 01-2245845, 08004455454\n"
+                + "Thank you for Banking with Us.");
+                return new ResponseEntity<>(LoginResponse.builder().user(user).token(token).build(), HttpStatus.OK);
+            }
+
         return null;
     }
 

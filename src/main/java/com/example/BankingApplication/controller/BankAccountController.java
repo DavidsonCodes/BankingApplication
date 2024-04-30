@@ -37,7 +37,7 @@ public class BankAccountController {
         return bankAccountService.createBankAccount(accountUser);
     }
 
-    @GetMapping
+    @GetMapping("/by-user")
     public ResponseEntity<BankAccount> getByUser(@RequestBody AccountUser user){
         return bankAccountService.getByUser(user);
     }

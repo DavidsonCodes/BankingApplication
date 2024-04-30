@@ -24,7 +24,7 @@ public class TransactionService {
     }
 
     public ResponseEntity<Transactions> getByTransactionId(String transactionId){
-        return new ResponseEntity<>(transactionRepository.findByTransactionsId(transactionId), HttpStatus.OK);
+        return new ResponseEntity<>(transactionRepository.findByTransactionId(transactionId), HttpStatus.OK);
     }
 
     public ResponseEntity<Transactions> postNewTransaction(Transactions transactions){

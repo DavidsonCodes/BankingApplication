@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/users/register", "/users/login").permitAll()
                         .requestMatchers("/users/**").hasAnyAuthority(Role.USER.name())
-                        .requestMatchers("/admin/**").hasAnyAuthority(Role.ADMIN.name())
+                        .requestMatchers("/users/**").hasAnyAuthority(Role.ADMIN.name())
                         .anyRequest().authenticated())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)

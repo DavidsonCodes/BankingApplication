@@ -5,6 +5,7 @@ import com.example.BankingApplication.model.AccountUser;
 import com.example.BankingApplication.model.LoginRequest;
 import com.example.BankingApplication.model.LoginResponse;
 import com.example.BankingApplication.service.AccountUserService;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -45,7 +46,7 @@ public class AccountUserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginRequest loginRequest){
+    public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginRequest loginRequest) throws MessagingException {
         return userService.authenticate(loginRequest);
     }
     @PutMapping("/all/{id}")

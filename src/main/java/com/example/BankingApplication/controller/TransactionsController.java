@@ -26,7 +26,7 @@ public class TransactionsController {
         return transactionService.getById(id);
     }
 
-    @GetMapping("")
+    @GetMapping("/transId")
     public ResponseEntity<Transactions> getByTransactionId(@RequestParam String transactionId){
         return transactionService.getByTransactionId(transactionId);
     }
