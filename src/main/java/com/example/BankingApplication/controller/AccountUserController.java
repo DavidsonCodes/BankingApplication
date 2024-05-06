@@ -41,7 +41,7 @@ public class AccountUserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AccountUser> postAccountUser(@RequestBody AccountUser user){
+    public ResponseEntity<AccountUser> postAccountUser(@RequestBody AccountUser user) throws MessagingException {
         return userService.postAccountUser(user);
     }
 

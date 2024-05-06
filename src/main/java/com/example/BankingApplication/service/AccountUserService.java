@@ -1,5 +1,6 @@
 package com.example.BankingApplication.service;
 
+import com.example.BankingApplication.config.AccountConfiguration;
 import com.example.BankingApplication.model.AccountUser;
 import com.example.BankingApplication.model.LoginRequest;
 import com.example.BankingApplication.model.LoginResponse;
@@ -36,6 +37,12 @@ public class AccountUserService {
     @Autowired
     private MessageService messageService;
 
+    @Autowired
+    private AccountConfiguration accountConfiguration;
+
+    @Autowired
+    private BankAccountService bankAccountService;
+
     public ResponseEntity<List<AccountUser>> getAllAccountUsers(){
         return new ResponseEntity<>(userRepository.findAll(), HttpStatus.OK);
     }
@@ -53,12 +60,16 @@ public class AccountUserService {
 
             if( auth != null ){
                 AccountUser user = userRepository.getByUsername(request.getUsername());
+                System.out.println(user);
                 String token = jwtService.createToken(user);
+                System.out.println(token);
                 messageService.loginNotification(user.getUsername(), "Dear "+ user.getFirstName() +"\n" +
                         "There has been a successful login into your Banking Account. Please if you did not log in" +
                         " call us on the following number: 01-2245845, 08004455454\n"
                 + "Thank you for Banking with Us.");
                 return new ResponseEntity<>(LoginResponse.builder().user(user).token(token).build(), HttpStatus.OK);
+            } else {
+                System.out.println("auth is null");
             }
 
         return null;
@@ -69,10 +80,14 @@ public class AccountUserService {
     }
 
 
-    public ResponseEntity<AccountUser> postAccountUser(@RequestBody AccountUser user){
+    public ResponseEntity<AccountUser> postAccountUser(@RequestBody AccountUser user) throws MessagingException {
+        passwordEncoder = accountConfiguration.passwordEncoder();
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.USER);
-        return new ResponseEntity<>(userRepository.save(user), HttpStatus.CREATED);
+        messageService.registrationNotification(user.getUsername(), user.getFirstName());
+        AccountUser savedUser = userRepository.save(user);
+        bankAccountService.createBankAccount(savedUser);
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
 

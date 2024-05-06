@@ -1,7 +1,6 @@
 package com.example.BankingApplication.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Pattern;
 
 @Entity(name = "accounts")
 public class BankAccount {

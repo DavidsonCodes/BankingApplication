@@ -29,12 +29,21 @@ public class BankAccountService {
         return new ResponseEntity<>(bankAccountRepository.findByUser(user), HttpStatus.OK);
     }
 
+    public ResponseEntity<BankAccount> getByAccountNumber(String accountNumber){
+        return new ResponseEntity<>(bankAccountRepository.findBankAccountByAccountNumber(accountNumber), HttpStatus.OK);
+    }
+
+    public ResponseEntity<BankAccount> updateAccount(BankAccount bankAccount){
+        return new ResponseEntity<>(bankAccountRepository.save(bankAccount), HttpStatus.OK);
+    }
+
     public ResponseEntity<BankAccount> createBankAccount(AccountUser accountUser, double openingAmount ){
         StringBuilder accountNumber = new StringBuilder();
         int count = 0;
-        while(count < accountNumber.length()){
+        while(count < 10){
             int randomInt = new Random().nextInt(10);
             accountNumber.append(randomInt);
+            count++;
         }
         BankAccount account = new BankAccount(accountNumber.toString(), openingAmount, accountUser);
         return new ResponseEntity<>(bankAccountRepository.save(account), HttpStatus.CREATED);
@@ -43,9 +52,10 @@ public class BankAccountService {
     public ResponseEntity<BankAccount> createBankAccount(AccountUser accountUser ){
         StringBuilder accountNumber = new StringBuilder();
         int count = 0;
-        while(count < accountNumber.length()){
+        while(count < 10){
             int randomInt = new Random().nextInt(10);
             accountNumber.append(randomInt);
+            count++;
         }
         BankAccount account = new BankAccount(accountNumber.toString(), 0.00, accountUser);
         return new ResponseEntity<>(bankAccountRepository.save(account), HttpStatus.CREATED);
