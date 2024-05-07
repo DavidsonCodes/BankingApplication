@@ -30,15 +30,22 @@ public class TransactionService {
     }
 
     public ResponseEntity<Transactions> postNewTransaction(Transactions transactions){
+        transactions.setTransactionDate(new Date(System.currentTimeMillis()));
+        return new ResponseEntity<>(transactionRepository.save(transactions), HttpStatus.CREATED);
+    }
+
+    public ResponseEntity<Transactions> postNewTransaction(Transactions transactions, String txnId){
+        transactions.setTransactionDate(new Date(System.currentTimeMillis()));
+        return new ResponseEntity<>(transactionRepository.save(transactions), HttpStatus.CREATED);
+    }
+
+    public String generateTxnId(){
         StringBuilder transId = new StringBuilder();
         transId.append("TXN");
         for( int i = 0; i < 10; i++ ){
             int random = new Random().nextInt(10);
             transId.append(random);
         }
-        transactions.setTransactionId(transId.toString());
-        transactions.setTransactionDate(new Date(System.currentTimeMillis()));
-        return new ResponseEntity<>(transactionRepository.save(transactions), HttpStatus.CREATED);
+        return transId.toString();
     }
-
 }

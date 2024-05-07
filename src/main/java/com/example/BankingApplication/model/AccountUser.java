@@ -141,6 +141,10 @@ public class AccountUser implements UserDetails {
         return phoneNumber;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }

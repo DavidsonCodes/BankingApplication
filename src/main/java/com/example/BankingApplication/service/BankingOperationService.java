@@ -1,16 +1,17 @@
 package com.example.BankingApplication.service;
 
 import com.example.BankingApplication.exception.TransactionException;
+import com.example.BankingApplication.model.AccountUser;
 import com.example.BankingApplication.model.BankAccount;
 import com.example.BankingApplication.model.TransactionType;
 import com.example.BankingApplication.model.Transactions;
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.beans.Transient;
 
 @Service
 public class BankingOperationService {
@@ -21,8 +22,15 @@ public class BankingOperationService {
     @Autowired
     private TransactionService transactionService;
 
-    public ResponseEntity<BankAccount> depositFund(String accountNumber, double amount){
-        if( amount < 1 ){
+    @Autowired
+    private MessageService messageService;
+
+    @Autowired
+    private AccountUserService accountUserService;
+
+    public ResponseEntity<BankAccount> depositFund(String accountNumber, double amount, String transId) throws MessagingException {
+        if( amount <= 0 ){
+            System.out.println(amount);
             throw new TransactionException("You can not deposit negative amount");
         }
         BankAccount account = bankAccountService.getByAccountNumber(accountNumber).getBody();
@@ -34,13 +42,18 @@ public class BankingOperationService {
         transaction.setAccountNumber(accountNumber);
         transaction.setAmount(amount);
         transaction.setTransactionType(TransactionType.DEPOSIT);
+        transaction.setTransactionId(transId);
         transactionService.postNewTransaction(transaction);
+        AccountUser user = accountUserService.getAccountUserById(account.getUser().getId()).getBody();
+        assert user != null;
+        messageService.depositNotification(user.getFirstName(), user.getUsername(), amount);
         return new ResponseEntity<>(bankAccountService.updateAccount(account).getBody(), HttpStatus.OK);
     }
 
-    public ResponseEntity<BankAccount> withdrawFund(String accountNumber, double amount){
-        if( amount < 1 ){
-            throw new TransactionException("You can not deposit negative amount");
+    public ResponseEntity<BankAccount> withdrawFund(String accountNumber, double amount, String transId){
+        if( amount <= 0 ){
+            System.out.println(amount);
+            throw new TransactionException("You can not withdraw negative amount");
         }
         BankAccount account = bankAccountService.getByAccountNumber(accountNumber).getBody();
         assert account != null;
@@ -54,15 +67,18 @@ public class BankingOperationService {
         transaction.setAccountNumber(accountNumber);
         transaction.setAmount(amount);
         transaction.setTransactionType(TransactionType.WITHDRAWAL);
+        transaction.setTransactionId(transId);
         transactionService.postNewTransaction(transaction);
+
         return new ResponseEntity<>(bankAccountService.updateAccount(account).getBody(), HttpStatus.OK);
     }
 
     @Transactional
-    public ResponseEntity<String> transferFunds(String accountFrom, String accountTo, double amount ){
+    public ResponseEntity<String> transferFunds(String accountFrom, String accountTo, double amount ) throws MessagingException{
         try{
-            withdrawFund(accountFrom, amount);
-            depositFund(accountTo, amount);
+            String transId = transactionService.generateTxnId();
+            withdrawFund(accountFrom, amount, transId);
+            depositFund(accountTo, amount, transId);
             return new ResponseEntity<>("Transaction Successful", HttpStatus.OK);
         } catch (TransactionException transactionException){
             System.out.println(transactionException.getMessage());

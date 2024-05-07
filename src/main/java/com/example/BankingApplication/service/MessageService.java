@@ -65,4 +65,16 @@ public class MessageService {
         javaMailSender.send(messageHelper.getMimeMessage());
 
     }
+
+    @Async
+    public void depositNotification(String firstName, String username, double amount) throws MessagingException {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true, "utf-8");
+        messageHelper.setTo(username);
+        messageHelper.setSubject("Fund Deposit Alert!");
+        String message = String.format("Dear %s,\nA deposit of %s has been credited into your account number.", firstName, amount);
+        messageHelper.setText(message);
+
+        javaMailSender.send(messageHelper.getMimeMessage());
+    }
 }
