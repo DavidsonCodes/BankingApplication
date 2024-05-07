@@ -28,7 +28,7 @@ public class BankAccountController {
     }
 
     @PostMapping("/withdraw")
-    public ResponseEntity<BankAccount> withdrawFund(@RequestBody OperationRequest request){
+    public ResponseEntity<BankAccount> withdrawFund(@RequestBody OperationRequest request) throws MessagingException{
         return new ResponseEntity<>(operationService.withdrawFund(request.getAccountNumber(), request.getAmount(), transactionService.generateTxnId()).getBody(), HttpStatus.OK);
     }
 

@@ -50,7 +50,7 @@ public class BankingOperationService {
         return new ResponseEntity<>(bankAccountService.updateAccount(account).getBody(), HttpStatus.OK);
     }
 
-    public ResponseEntity<BankAccount> withdrawFund(String accountNumber, double amount, String transId){
+    public ResponseEntity<BankAccount> withdrawFund(String accountNumber, double amount, String transId) throws MessagingException{
         if( amount <= 0 ){
             System.out.println(amount);
             throw new TransactionException("You can not withdraw negative amount");
@@ -69,7 +69,9 @@ public class BankingOperationService {
         transaction.setTransactionType(TransactionType.WITHDRAWAL);
         transaction.setTransactionId(transId);
         transactionService.postNewTransaction(transaction);
-
+        AccountUser user = accountUserService.getAccountUserById(account.getUser().getId()).getBody();
+        assert user != null;
+        messageService.withdrawalNotification(user.getFirstName(), user.getUsername(), amount);
         return new ResponseEntity<>(bankAccountService.updateAccount(account).getBody(), HttpStatus.OK);
     }
 

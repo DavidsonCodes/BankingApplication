@@ -5,6 +5,7 @@ import com.example.BankingApplication.model.AccountUser;
 import com.example.BankingApplication.model.LoginRequest;
 import com.example.BankingApplication.model.LoginResponse;
 import com.example.BankingApplication.service.AccountUserService;
+import com.example.BankingApplication.service.MessageService;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
@@ -15,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/users")
@@ -23,6 +25,23 @@ public class AccountUserController {
 
     @Autowired
     private AccountUserService userService;
+
+    @Autowired
+    private MessageService messageService;
+
+    @GetMapping("/getResetCode")
+    public void getResetCode(@RequestParam String username ) throws MessagingException{
+        AccountUser user = userService.getAccountUserByUsername(username).getBody();
+        StringBuilder randomCode = new StringBuilder();
+        int count = 1;
+        while(count <= 6 ){
+            String x = String.valueOf(new Random().nextInt(10));
+            randomCode.append(x);
+            count++;
+        }
+        messageService.sendResetCode(user.getUsername(), randomCode.toString());
+
+    }
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
