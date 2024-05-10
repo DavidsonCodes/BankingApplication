@@ -1,6 +1,5 @@
 package com.example.BankingApplication.service;
 
-import com.example.BankingApplication.model.AccountUser;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -8,8 +7,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
 
 @Service
 public class MessageService {
@@ -90,14 +87,4 @@ public class MessageService {
         javaMailSender.send(messageHelper.getMimeMessage());
     }
 
-    public void sendResetCode(String username, String code) throws MessagingException {
-        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true, "utf-8");
-        messageHelper.setTo(username);
-        messageHelper.setSubject("Password Reset Code!");
-        String message = String.format("Dear %s,\nHere is your password reset code: %s.", username, code);
-        messageHelper.setText(message);
-
-        javaMailSender.send(messageHelper.getMimeMessage());
-    }
 }

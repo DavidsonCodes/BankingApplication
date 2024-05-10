@@ -29,19 +29,6 @@ public class AccountUserController {
     @Autowired
     private MessageService messageService;
 
-    @GetMapping("/getResetCode")
-    public void getResetCode(@RequestParam String username ) throws MessagingException{
-        AccountUser user = userService.getAccountUserByUsername(username).getBody();
-        StringBuilder randomCode = new StringBuilder();
-        int count = 1;
-        while(count <= 6 ){
-            String x = String.valueOf(new Random().nextInt(10));
-            randomCode.append(x);
-            count++;
-        }
-        messageService.sendResetCode(user.getUsername(), randomCode.toString());
-
-    }
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")

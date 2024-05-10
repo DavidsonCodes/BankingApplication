@@ -22,8 +22,6 @@ public class BankingApplication implements CommandLineRunner {
 	private AccountConfiguration accountConfiguration;
 
 
-
-
 	public static void main(String[] args) {
 		SpringApplication.run(BankingApplication.class, args);
 	}
@@ -42,7 +40,7 @@ public class BankingApplication implements CommandLineRunner {
 
 		AccountUser exist = accountUserService.getAccountUserByUsername("admin@gmail.com").getBody();
 
-		if( exist == null ){
+		if (exist == null) {
 			accountUserService.postAccountUser(adminUser);
 		}
 
